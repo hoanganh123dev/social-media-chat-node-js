@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { followUser, unfollowUser } from "../../actions/UserAction";
+import { createChat } from "../../actions/ChatAction";
 const User = ({ person }) => {
   const publicFolder = process.env.REACT_APP_PUBLIC_FOLDER;
   const { user } = useSelector((state) => state.authReducer.authData);
@@ -14,6 +15,11 @@ const User = ({ person }) => {
       ? dispatch(unfollowUser(person._id, user))
       : dispatch(followUser(person._id, user));
     setFollowing((prev) => !prev);
+  };
+  // Xử lý sự kiện khi nhấn vào profile
+  const handleProfileClick = () => {
+    // Gửi yêu cầu tạo cuộc trò chuyện với người này
+    dispatch(createChat(user._id, person._id)); // Truyền senderId và receiverId
   };
   return (
     <div className="follower">

@@ -1,11 +1,12 @@
 import MessageModel from "../models/messageModel.js";
 
 export const addMessage = async (req, res) => {
-  const { chatId, senderId, text } = req.body;
+  const { chatId, senderId, text, imageUrl } = req.body;
   const message = new MessageModel({
     chatId,
     senderId,
     text,
+    imageUrl, // Thêm đường dẫn ảnh vào message
   });
   try {
     const result = await message.save();
@@ -14,6 +15,7 @@ export const addMessage = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
 
 export const getMessages = async (req, res) => {
   const { chatId } = req.params;

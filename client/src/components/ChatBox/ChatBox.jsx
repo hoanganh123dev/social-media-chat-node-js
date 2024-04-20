@@ -10,6 +10,7 @@ const ChatBox = ({ chat, currentUser, setSendMessage,  receivedMessage }) => {
   const [userData, setUserData] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const handleChange = (newMessage)=> {
     setNewMessage(newMessage)
@@ -59,7 +60,9 @@ const ChatBox = ({ chat, currentUser, setSendMessage,  receivedMessage }) => {
       senderId : currentUser,
       text: newMessage,
       chatId: chat._id,
+      imageUrl: selectedImage, // Thêm đường dẫn ảnh vào tin nhắn
   }
+
   const receiverId = chat.members.find((id)=>id!==currentUser);
   // send message to socket server
   setSendMessage({...message, receiverId})
@@ -68,13 +71,24 @@ const ChatBox = ({ chat, currentUser, setSendMessage,  receivedMessage }) => {
     const { data } = await addMessage(message);
     setMessages([...messages, data]);
     setNewMessage("");
+    setSelectedImage(null); // Reset ảnh đã chọn sau khi gửi
   }
   catch
   {
     console.log("error")
   }
 }
-
+// Xử lý sự kiện khi người dùng chọn ảnh
+const handleImageChange = (e) => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    setSelectedImage(reader.result); // Lưu đường dẫn ảnh đã chọn
+  };
+  if (file) {
+    reader.readAsDataURL(file);
+  }
+};
 // Receive Message from parent component
 useEffect(()=> {
   console.log("Message Arrived: ", receivedMessage)
@@ -135,6 +149,9 @@ useEffect(()=> {
                         : "message"
                     }
                   >
+                    {message.imageUrl && (
+                  <img src={message.imageUrl} alt="Message" className="message-image" />
+                )}
                     <span>{message.text}</span>{" "}
                     <span>{format(message.createdAt)}</span>
                   </div>
@@ -155,6 +172,7 @@ useEffect(()=> {
                 id=""
                 style={{ display: "none" }}
                 ref={imageRef}
+                onChange={handleImageChange} // Bắt sự kiện khi người dùng chọn ảnh
               />
             </div>{" "}
           </>
